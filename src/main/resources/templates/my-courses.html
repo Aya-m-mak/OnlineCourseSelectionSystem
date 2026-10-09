@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>我的课程 - 在线选课系统</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f7fb;
+            color: #222;
+        }
+
+        .header {
+            background: #2b5fab;
+            color: white;
+            padding: 22px 50px;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+        }
+
+        .header p {
+            margin: 6px 0 0;
+            font-size: 14px;
+        }
+
+        .container {
+            width: 75%;
+            margin: 45px auto;
+        }
+
+        .student-info {
+            background: white;
+            padding: 20px 25px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+        }
+
+        .student-info h2 {
+            margin-top: 0;
+            color: #2459a6;
+        }
+
+        .title {
+            color: #2459a6;
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+        }
+
+        th {
+            background: #eaf1fa;
+            color: #2459a6;
+            padding: 16px;
+        }
+
+        td {
+            padding: 16px;
+            text-align: center;
+            border-top: 1px solid #eeeeee;
+        }
+
+        .empty {
+            background: white;
+            padding: 35px;
+            text-align: center;
+            border-radius: 10px;
+            color: #777;
+        }
+
+        .back-button {
+            display: inline-block;
+            margin-top: 25px;
+            padding: 11px 25px;
+            background: #2b5fab;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+        }
+
+        .back-button:hover {
+            background: #204d91;
+        }
+
+        .footer {
+            text-align: center;
+            color: #999;
+            margin-top: 60px;
+            padding-bottom: 30px;
+        }
+        .drop-btn {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.drop-btn:hover {
+    background-color: #c82333;
+}
+        .priority-btn {
+    background-color: #2b5fab;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    margin-right: 5px;
+}
+
+.priority-btn:hover {
+    background-color: #204d91;
+}
+        .submit-btn {
+    background-color: #198754;
+    color: white;
+    border: none;
+    padding: 11px 25px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-right: 10px;
+}
+
+.submit-btn:hover {
+    background-color: #157347;
+}
+
+.success-message {
+    background: #d1e7dd;
+    color: #0f5132;
+    padding: 14px 20px;
+    border-radius: 6px;
+    margin-bottom: 18px;
+    font-weight: bold;
+}
+        .allocate-btn {
+    background-color: #6f42c1;
+    color: white;
+    border: none;
+    padding: 11px 25px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.allocate-btn:hover {
+    background-color: #59359a;
+}
+
+.allocation-result {
+    margin-top: 30px;
+    margin-bottom: 30px;
+}
+
+.allocation-result h2 {
+    color: #2459a6;
+}
+
+.allocated-status {
+    color: #198754;
+    font-weight: bold;
+}
+    </style>
+</head>
+
+<body>
+
+<div class="header">
+    <h1>在线选课系统</h1>
+    <p>Online Course Selection System</p>
+</div>
+
+<div class="container">
+
+    <div class="student-info">
+        <h2>学生信息</h2>
+        <p>
+            学号：
+            <strong th:text="${student.studentId}"></strong>
+        </p>
+        <p>
+            姓名：
+            <strong th:text="${student.name}"></strong>
+        </p>
+    </div>
+
+    <h2 class="title">我的课程</h2>
+
+    <table th:if="${!selectedCourses.isEmpty()}">
+        <thead>
+        <tr>
+            <th>优先级</th>
+            <th>课程编号</th>
+            <th>课程名称</th>
+            <th>授课教师</th>
+            <th>课程容量</th>
+            <th>剩余名额</th>
+            <th>操作</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr th:each="course, stat : ${selectedCourses}">
+            <td>
+                <strong th:text="'第' + ${stat.index + 1} + '志愿'"></strong>
+            </td>
+            <td th:text="${course.id}"></td>
+            <td th:text="${course.courseName}"></td>
+            <td th:text="${course.teacher}"></td>
+            <td th:text="${course.capacity}"></td>
+
+            <td th:text="${course.capacity - course.selectedCount}"></td>
+
+            <td>
+
+                <form action="/move-course-up"
+                      method="post"
+                      style="display:inline;"
+                      th:if="${!stat.first && !student.preferencesSubmitted}">
+
+                    <input type="hidden"
+                           name="courseId"
+                           th:value="${course.id}">
+
+                    <button type="submit" class="priority-btn">
+                        ↑ 上移
+                    </button>
+                </form>
+
+
+                <form action="/move-course-down"
+                      method="post"
+                      style="display:inline;"
+                      th:if="${!stat.last && !student.preferencesSubmitted}">
+
+                    <input type="hidden"
+                           name="courseId"
+                           th:value="${course.id}">
+
+                    <button type="submit" class="priority-btn">
+                        ↓ 下移
+                    </button>
+                </form>
+
+
+                <form action="/drop-course"
+                      method="post"
+                      th:if="${!student.preferencesSubmitted}"
+                      style="display:inline;">
+
+                    <input type="hidden"
+                           name="courseId"
+                           th:value="${course.id}">
+
+                    <button type="submit" class="drop-btn">
+                        退选课程
+                    </button>
+                </form>
+
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <div class="empty" th:if="${selectedCourses.isEmpty()}">
+        您还没有选择任何课程
+    </div>
+
+    <h2 class="title" style="margin-top: 35px;">备选课程</h2>
+
+    <table th:if="${!backupCourses.isEmpty()}">
+        <thead>
+        <tr>
+            <th>课程编号</th>
+            <th>课程名称</th>
+            <th>授课教师</th>
+            <th>课程容量</th>
+            <th>剩余名额</th>
+            <th>操作</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr th:each="course : ${backupCourses}">
+            <td th:text="${course.id}"></td>
+            <td th:text="${course.courseName}"></td>
+            <td th:text="${course.teacher}"></td>
+            <td th:text="${course.capacity}"></td>
+
+            <td th:text="${course.capacity - course.selectedCount}"></td>
+
+            <td>
+                <form action="/remove-backup-course"
+                      method="post"
+                      th:if="${!student.preferencesSubmitted}">
+
+                    <input type="hidden"
+                           name="courseId"
+                           th:value="${course.id}">
+
+                    <button type="submit" class="drop-btn">
+                        移除备选
+                    </button>
+
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <div class="empty" th:if="${backupCourses.isEmpty()}">
+        您还没有设置备选课程
+    </div>
+
+    <form action="/submit-preferences"
+          method="post"
+          style="display:inline;"
+          th:if="${!selectedCourses.isEmpty() && !student.preferencesSubmitted}">
+
+        <button type="submit" class="submit-btn">
+            提交志愿
+        </button>
+    </form>
+    <div class="success-message"
+         th:if="${student.preferencesSubmitted}">
+        ✓ 志愿提交成功
+    </div>
+
+    <div th:if="${student.preferencesSubmitted}"
+         class="allocation-result">
+
+        <h2>系统分配结果</h2>
+
+        <table th:if="${!allocatedCourses.isEmpty()}">
+            <thead>
+            <tr>
+                <th>课程编号</th>
+                <th>课程名称</th>
+                <th>授课教师</th>
+                <th>上课时间</th>
+                <th>分配状态</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            <tr th:each="course : ${allocatedCourses}">
+                <td th:text="${course.id}"></td>
+                <td th:text="${course.courseName}"></td>
+                <td th:text="${course.teacher}"></td>
+                <td>
+                    <span th:text="${course.dayOfWeek}"></span>
+                    <span th:text="${course.classTime}"></span>
+                </td>
+                <td class="allocated-status">分配成功</td>
+            </tr>
+            </tbody>
+        </table>
+
+        <div class="empty"
+             th:if="${student.allocationCompleted
+              and allocatedCourses.isEmpty()}"
+             style="color: #dc3545; font-weight: bold;">
+            分配失败：所选课程名额已满或时间冲突
+        </div>
+
+        <div class="empty"
+             th:if="${!student.allocationCompleted
+              and allocatedCourses.isEmpty()}">
+            等待管理员进行课程分配
+        </div>
+
+    </div>
+
+    <a href="/schedule" class="back-button">查看周课表</a>
+    <a href="/courses" class="back-button">返回课程列表</a>
+
+</div>
+
+<div class="footer">
+    在线选课系统 · Online Course Selection System
+</div>
+
+</body>
+</html>

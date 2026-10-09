@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>周课表 - 在线选课系统</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, "Microsoft YaHei", sans-serif;
+            background: #f4f7fb;
+            color: #222;
+        }
+
+        .header {
+            background: #2b5fab;
+            color: white;
+            padding: 22px 50px;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+        }
+
+        .header p {
+            margin: 6px 0 0;
+            font-size: 14px;
+        }
+
+        .container {
+            width: 85%;
+            max-width: 1200px;
+            margin: 40px auto;
+        }
+
+        .student-info {
+            background: white;
+            padding: 20px 25px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+        }
+
+        .student-info h2 {
+            margin-top: 0;
+            color: #2459a6;
+        }
+
+        .title {
+            color: #2459a6;
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+        }
+
+        th {
+            background: #eaf1fa;
+            color: #2459a6;
+            padding: 16px;
+            text-align: center;
+        }
+
+        td {
+            padding: 16px;
+            text-align: center;
+            border-top: 1px solid #eeeeee;
+        }
+
+        .course-name {
+            font-weight: bold;
+            color: #2459a6;
+        }
+
+        .empty {
+            background: white;
+            padding: 35px;
+            text-align: center;
+            border-radius: 10px;
+            color: #777;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+        }
+
+        .buttons {
+            margin-top: 25px;
+        }
+
+        .back-button {
+            display: inline-block;
+            padding: 11px 25px;
+            background: #2b5fab;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            margin-right: 10px;
+        }
+
+        .back-button:hover {
+            background: #204d91;
+        }
+
+        .footer {
+            text-align: center;
+            color: #999;
+            margin-top: 60px;
+            padding-bottom: 30px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="header">
+    <h1>在线选课系统</h1>
+    <p>Online Course Selection System</p>
+</div>
+
+<div class="container">
+
+    <div class="student-info">
+        <h2>学生信息</h2>
+
+        <p>
+            学号：
+            <strong th:text="${student.studentId}"></strong>
+        </p>
+
+        <p>
+            姓名：
+            <strong th:text="${student.name}"></strong>
+        </p>
+    </div>
+
+    <h2 class="title">周课表</h2>
+
+    <table th:if="${!selectedCourses.isEmpty()}">
+        <thead>
+        <tr>
+            <th>星期</th>
+            <th>节次 / 时间</th>
+            <th>课程名称</th>
+            <th>授课教师</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr th:each="course : ${selectedCourses}">
+            <td th:text="${course.dayOfWeek}"></td>
+
+            <td th:text="${course.classTime}"></td>
+
+            <td class="course-name"
+                th:text="${course.courseName}">
+            </td>
+
+            <td th:text="${course.teacher}"></td>
+        </tr>
+        </tbody>
+    </table>
+
+    <div class="empty"
+         th:if="${selectedCourses.isEmpty()}">
+        您还没有选择课程，暂无课表
+    </div>
+
+    <div class="buttons">
+        <a href="/my-courses" class="back-button">
+            返回我的课程
+        </a>
+
+        <a href="/courses" class="back-button">
+            返回课程列表
+        </a>
+    </div>
+
+</div>
+
+<div class="footer">
+    在线选课系统 · Online Course Selection System
+</div>
+
+</body>
+</html>

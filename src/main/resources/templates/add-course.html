@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>添加课程</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f4f7fb;
+        }
+
+        .container {
+            width: 500px;
+            margin: 80px auto;
+            background: white;
+            padding: 35px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+
+        h2 {
+            color: #2f66b3;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            box-sizing: border-box;
+            border: 1px solid #d5dce5;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+
+        .save-btn {
+            background-color: #2f66b3;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .back-btn {
+            display: inline-block;
+            margin-left: 12px;
+            padding: 11px 25px;
+            border: 1px solid #2f66b3;
+            border-radius: 6px;
+            color: #2f66b3;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h2>添加课程</h2>
+    <div th:if="${param.error != null and param.error[0] == 'duplicate'}"
+         style="background-color: #ffe6e6;
+            color: #c62828;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-size: 14px;">
+        课程编号已存在，请使用其他编号！
+    </div>
+
+    <form action="/admin/add-course" method="post">
+
+        <div class="form-group">
+            <label>课程编号</label>
+            <input type="number" name="courseId" required>
+        </div>
+
+        <div class="form-group">
+            <label>课程名称</label>
+            <input type="text" name="courseName" required>
+        </div>
+
+        <div class="form-group">
+            <label>授课教师</label>
+            <input type="text" name="teacher" required>
+        </div>
+
+        <div class="form-group">
+            <label>课程容量</label>
+            <input type="number" name="capacity" min="1" required>
+        </div>
+
+        <button type="submit" class="save-btn">添加课程</button>
+
+        <a href="/admin" class="back-btn">返回</a>
+
+    </form>
+
+</div>
+
+</body>
+</html>

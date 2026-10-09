@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>在线选课系统</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, "Microsoft YaHei", sans-serif;
+            background: #f4f7fb;
+            color: #333;
+        }
+
+        .header {
+            background: #2457a6;
+            color: white;
+            padding: 22px 50px;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 26px;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.85;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1100px;
+            margin: 35px auto;
+        }
+
+        .title {
+            margin-bottom: 20px;
+        }
+
+        .title h2 {
+            color: #2457a6;
+            margin-bottom: 5px;
+        }
+
+        .course-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 3px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .course-table th {
+            background: #eef3fa;
+            padding: 15px;
+            text-align: center;
+            color: #2457a6;
+        }
+
+        .course-table td {
+            padding: 15px;
+            text-align: center;
+            border-top: 1px solid #eee;
+        }
+
+        .course-table tr:hover {
+            background: #f8faff;
+        }
+
+        .available {
+            color: #198754;
+            font-weight: bold;
+        }
+
+        .full {
+            color: #dc3545;
+            font-weight: bold;
+        }
+
+        .select-btn {
+            background: #2457a6;
+            color: white;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .select-btn:hover {
+            background: #183f7a;
+        }
+
+        .select-btn:disabled {
+            background: #aaa;
+            cursor: not-allowed;
+        }
+
+        .footer {
+            text-align: center;
+            color: #888;
+            margin-top: 35px;
+            padding: 20px;
+            font-size: 13px;
+        }
+        .logout-btn {
+    position: absolute;
+    right: 30px;
+    top: 28px;
+    padding: 10px 20px;
+    background-color: white;
+    color: #2457a6;
+    text-decoration: none;
+    border-radius: 6px;
+    font-weight: bold;
+}
+
+.logout-btn:hover {
+    background-color: #eef3fa;
+}
+        .backup-btn {
+    background-color: #f0ad4e;
+    color: white;
+    border: none;
+    padding: 10px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-left: 5px;
+}
+
+.backup-btn:hover {
+    background-color: #d99532;
+}
+        .backup-btn:disabled {
+    background-color: #aaa;
+    cursor: not-allowed;
+}
+    </style>
+</head>
+
+<body>
+
+<div class="header">
+    <h1>在线选课系统</h1>
+    <p>Online Course Selection System</p>
+
+    <a href="/student-logout" class="logout-btn">退出登录</a>
+</div>
+
+<div class="container">
+
+    <div class="title">
+        <h2>课程列表</h2>
+        <p>请选择您需要的课程</p>
+    </div>
+
+    <form action="/courses" method="get"
+          style="display: flex; gap: 10px; margin-bottom: 20px;">
+
+        <input type="text"
+               name="keyword"
+               th:value="${keyword}"
+               placeholder="请输入课程名称或教师姓名"
+               style="flex: 1;
+                  padding: 10px 14px;
+                  border: 1px solid #ccc;
+                  border-radius: 6px;
+                  font-size: 15px;">
+
+        <button type="submit"
+                style="padding: 10px 22px;
+                   background: #2b5fab;
+                   color: white;
+                   border: none;
+                   border-radius: 6px;
+                   cursor: pointer;">
+            搜索
+        </button>
+
+        <a href="/courses"
+           style="padding: 10px 18px;
+              background: #6c757d;
+              color: white;
+              text-decoration: none;
+              border-radius: 6px;">
+            重置
+        </a>
+
+    </form>
+    <div style="text-align: right; margin-bottom: 20px;">
+        <a href="/my-courses"
+           style="display: inline-block;
+              padding: 10px 20px;
+              background: #2b5fab;
+              color: white;
+              text-decoration: none;
+              border-radius: 6px;">
+            我的课程
+        </a>
+    </div>
+
+    <table class="course-table">
+
+        <thead>
+        <tr>
+            <th>课程编号</th>
+            <th>课程名称</th>
+            <th>授课教师</th>
+            <th>课程容量</th>
+            <th>已选人数</th>
+            <th>剩余名额</th>
+            <th>操作</th>
+        </tr>
+        </thead>
+
+        <tbody>
+
+        <tr th:each="course : ${courses}">
+
+            <td th:text="${course.id}"></td>
+
+            <td th:text="${course.courseName}"></td>
+
+            <td th:text="${course.teacher}"></td>
+
+            <td th:text="${course.capacity}"></td>
+
+            <td th:text="${course.selectedCount}"></td>
+
+            <td th:text="${course.capacity - course.selectedCount}"
+                th:class="${course.capacity > course.selectedCount}
+                ? 'available' : 'full'">
+            </td>
+
+            <td>
+                <form action="/select-course"
+                      method="post"
+                      style="display:inline;">
+
+                    <input type="hidden"
+                           name="courseId"
+                           th:value="${course.id}">
+
+                    <button type="submit"
+                            class="select-btn"
+                            th:disabled="${student != null && student.preferencesSubmitted}">
+                        选择课程
+                    </button>
+
+                </form>
+
+                <form action="/add-backup-course"
+                      method="post"
+                      style="display:inline;">
+
+                    <input type="hidden"
+                           name="courseId"
+                           th:value="${course.id}">
+
+                    <button type="submit"
+                            class="backup-btn"
+                            th:disabled="${student != null && student.preferencesSubmitted}">
+                        设为备选
+                    </button>
+                </form>
+            </td>
+
+        </tr>
+
+        </tbody>
+
+    </table>
+
+</div>
+
+<div class="footer">
+    在线选课系统 · Online Course Selection System
+</div>
+
+</body>
+</html>

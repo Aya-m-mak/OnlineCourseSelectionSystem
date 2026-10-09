@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>管理员控制台</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f3f6fb;
+            color: #222;
+        }
+
+        .header {
+            background: #2b5fab;
+            color: white;
+            padding: 20px 30px;
+            position: relative;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+        }
+
+        .header p {
+            margin: 5px 0 0;
+            font-size: 14px;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 40px auto;
+        }
+
+        .admin-info {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+        }
+
+        .admin-info h2 {
+            margin-top: 0;
+            color: #2b5fab;
+        }
+
+        .course-title {
+            color: #2b5fab;
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+        }
+
+        th {
+            background: #e8f0fb;
+            color: #1f5ba8;
+            padding: 16px;
+            text-align: center;
+        }
+
+        td {
+            padding: 16px;
+            text-align: center;
+            border-bottom: 1px solid #eeeeee;
+        }
+
+        .remaining {
+            color: #07883e;
+            font-weight: bold;
+        }
+
+        .footer {
+            text-align: center;
+            color: #999;
+            margin: 50px 0;
+            font-size: 14px;
+        }
+        .edit-button {
+    display: inline-block;
+    padding: 8px 18px;
+    background: #2b5fab;
+    color: white;
+    text-decoration: none;
+    border-radius: 6px;
+}
+
+.edit-button:hover {
+    background: #204b8f;
+}
+        .add-course-area {
+    margin-bottom: 20px;
+    text-align: right;
+}
+
+.add-course-btn {
+    display: inline-block;
+    padding: 12px 24px;
+    background-color: #2f66b3;
+    color: white;
+    text-decoration: none;
+    border-radius: 6px;
+    font-size: 16px;
+}
+
+.add-course-btn:hover {
+    background-color: #245394;
+}
+        .delete-btn {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-left: 8px;
+}
+
+.delete-btn:hover {
+    background-color: #b52a37;
+}
+        .logout-btn {
+    position: absolute;
+    right: 30px;
+    top: 28px;
+    padding: 10px 20px;
+    background-color: white;
+    color: #2f66b3;
+    text-decoration: none;
+    border-radius: 6px;
+    font-weight: bold;
+}
+
+.logout-btn:hover {
+    background-color: #eef3fa;
+}
+    </style>
+</head>
+
+<body>
+
+<div class="header">
+    <h1>管理员控制台</h1>
+    <p>Online Course Selection System</p>
+
+    <a href="/admin-logout" class="logout-btn">退出登录</a>
+</div>
+
+<div class="container">
+
+    <div class="admin-info">
+        <h2>管理员信息</h2>
+
+        <p>
+            管理员账号：
+            <strong th:text="${administrator.adminId}"></strong>
+        </p>
+
+        <p>
+            管理员姓名：
+            <strong th:text="${administrator.adminName}"></strong>
+        </p>
+    </div>
+
+    <h2 class="course-title">课程管理</h2>
+    <div class="add-course-area">
+        <a href="/admin/add-course" class="add-course-btn">
+            添加课程
+        </a>
+    </div>
+
+    <table>
+        <thead>
+        <tr>
+            <th>课程编号</th>
+            <th>课程名称</th>
+            <th>授课教师</th>
+            <th>课程容量</th>
+            <th>已选人数</th>
+            <th>剩余名额</th>
+            <th>操作</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr th:each="course : ${courses}">
+            <td th:text="${course.id}"></td>
+            <td th:text="${course.courseName}"></td>
+            <td th:text="${course.teacher}"></td>
+            <td th:text="${course.capacity}"></td>
+            <td th:text="${course.selectedCount}"></td>
+            <td class="remaining"
+                th:text="${course.capacity - course.selectedCount}">
+            </td>
+            <td>
+                <a th:href="@{/admin/edit-course(courseId=${course.id})}">
+                    编辑
+                </a>
+
+                <form action="/admin/delete-course"
+                      method="post"
+                      style="display:inline;">
+
+                    <input type="hidden"
+                           name="courseId"
+                           th:value="${course.id}">
+
+                    <button type="submit"
+                            class="delete-btn">
+                        删除
+                    </button>
+
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+</div>
+
+<div class="footer">
+    在线选课系统 · Online Course Selection System
+</div>
+<div style="margin-top: 25px; margin-bottom: 25px;">
+    <form th:action="@{/allocate-courses}" method="post">
+        <button type="submit"
+                style="background-color: #7042c5;
+                       color: white;
+                       padding: 12px 24px;
+                       border: none;
+                       border-radius: 6px;
+                       cursor: pointer;
+                       font-size: 15px;">
+            开始系统分配
+        </button>
+    </form>
+</div>
+
+</body>
+</html>
