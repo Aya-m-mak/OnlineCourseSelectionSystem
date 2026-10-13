@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
+import org.springframework.web.bind.annotation.ResponseBody;
+import java.util.Map;
 
 @Controller
 public class CourseController {
@@ -532,5 +534,27 @@ public class CourseController {
     public String studentLogout(HttpSession session) {
         session.removeAttribute("student");
         return "redirect:/";
+    }
+    @GetMapping("/api/courses")
+    @ResponseBody
+    public List<Map<String, Object>> getCoursesApi(
+            @RequestParam(required = false) String keyword) {
+
+        String searchKeyword = keyword == null
+                ? ""
+                : keyword.trim().toLowerCase();
+
+        return courseRepository.findAll().stream()
+                .filter(course ->
+                        course.getCourseName().toLowerCase().contains(searchKeyword)
+                                || course.getTeacher().toLowerCase().contains(searchKeyword))
+                .map(course -> Map.<String, Object>of(
+                        "id", course.getId(),
+                        "courseName", course.getCourseName(),
+                        "teacher", course.getTeacher(),
+                        "capacity", course.getCapacity(),
+                        "selectedCount", course.getSelectedCount()
+                ))
+                .toList();
     }
 }
