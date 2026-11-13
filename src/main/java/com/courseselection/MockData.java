@@ -47,6 +47,23 @@ public class MockData {
                 6, "数据结构与算法", "曹春萍",
                 45, 39
         ));
+
+        courses.add(new Course(
+                7, "Python程序设计", "李锐",
+                40, 0
+        ));
+
+        courses.add(new Course(
+                8, "人工智能基础", "欧广宇",
+                40, 0
+        ));
+
+        courses.get(6).setDayOfWeek("星期二");
+        courses.get(6).setClassTime("第6-7节 13:00-14:25");
+
+        courses.get(7).setDayOfWeek("星期四");
+        courses.get(7).setClassTime("第8-10节 14:45-16:55");
+
         courses.get(0).setDayOfWeek("星期一");
         courses.get(0).setClassTime("第3-5节 09:45-11:55");
 
